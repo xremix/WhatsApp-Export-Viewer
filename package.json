@@ -1,0 +1,46 @@
+{
+  "name": "whatsapp-export-viewer",
+  "version": "1.0.0",
+  "description": "A client-side web application for viewing WhatsApp chat exports in the browser",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,js --report-unused-disable-directives --max-warnings 0",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lit": "^3.1.0",
+    "jszip": "^3.10.1",
+    "lit-virtualizer": "^0.4.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-legacy": "^5.0.0",
+    "eslint": "^8.45.0",
+    "sass": "^1.69.0",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "chat",
+    "viewer",
+    "export",
+    "lit",
+    "web-components",
+    "client-side"
+  ],
+  "author": "WhatsApp Export Viewer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/WhatsApp-Export-Viewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/WhatsApp-Export-Viewer/issues"
+  },
+  "homepage": "https://github.com/yourusername/WhatsApp-Export-Viewer#readme"
+}
