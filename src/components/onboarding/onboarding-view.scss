@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #ffffff;
+  color: #111b21;
+}
+
+.onboarding-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  background-color: #25d366;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  min-height: 4rem;
+}
+
+.header-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 0.75rem;
+  color: white;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 1.125rem;
+  color: white;
+  font-weight: 600;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.page-title {
+  margin: 0 0 2rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111b21;
+}
+
+.upload-zone {
+  width: 100%;
+  max-width: 500px;
+  height: 200px;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
+  background-color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    border-color: #25d366;
+    background-color: #f0fdf4;
+  }
+}
+
+.upload-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  color: #9ca3af;
+}
+
+.upload-text {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.info-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-decoration: none;
+  margin-bottom: 2rem;
+}
+
+.info-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  background-color: #6b7280;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.scroll-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
+}

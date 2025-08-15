@@ -6,7 +6,6 @@ import '../onboarding/onboarding-view';
 @customElement('whatsapp-viewer-app')
 export class WhatsAppViewerApp extends LitElement {
 
-
     static styles = css`
     :host {
       display: block;
@@ -17,10 +16,6 @@ export class WhatsAppViewerApp extends LitElement {
   constructor() {
     super();
   }
-
-
-
-
 
     render() {
     return html`
