@@ -10,7 +10,9 @@ export class WhatsAppViewerApp extends LitElement {
     :host {
       display: block;
       height: 100vh;
-      background-color: var(--color-background);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #ffffff;
+      color: #111b21;
     }
 
     .app-container {
@@ -20,33 +22,33 @@ export class WhatsAppViewerApp extends LitElement {
     }
 
     .header {
-      background-color: var(--color-surface);
-      border-bottom: 1px solid var(--color-border);
-      padding: var(--spacing-md) var(--spacing-lg);
+      background-color: #f0f2f5;
+      border-bottom: 1px solid #e9edef;
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: var(--header-height);
+      min-height: 4rem;
     }
 
     .header h1 {
       margin: 0;
-      font-size: var(--font-size-xl);
-      color: var(--color-text-primary);
+      font-size: 1.25rem;
+      color: #111b21;
     }
 
     .theme-toggle {
       background: none;
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
-      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid #e9edef;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
       cursor: pointer;
-      color: var(--color-text-primary);
-      transition: all var(--transition-fast);
+      color: #111b21;
+      transition: all 0.15s ease-in-out;
     }
 
     .theme-toggle:hover {
-      background-color: var(--color-surface);
+      background-color: #e9edef;
     }
 
     .main-content {
@@ -62,38 +64,29 @@ export class WhatsAppViewerApp extends LitElement {
       justify-content: center;
       height: 100%;
       text-align: center;
-      padding: var(--spacing-xl);
+      padding: 2rem;
     }
 
     .welcome h2 {
-      margin: 0 0 var(--spacing-md) 0;
-      font-size: var(--font-size-xxl);
-      color: var(--color-text-primary);
+      margin: 0 0 1rem 0;
+      font-size: 1.5rem;
+      color: #111b21;
     }
 
     .welcome p {
       margin: 0;
-      font-size: var(--font-size-lg);
-      color: var(--color-text-secondary);
+      font-size: 1.125rem;
+      color: #667781;
     }
+
+
   `;
 
   constructor() {
     super();
-    this.setupTheme();
   }
 
-  private setupTheme(): void {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-  }
 
-  private toggleTheme(): void {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-  }
 
 
 
@@ -102,13 +95,7 @@ export class WhatsAppViewerApp extends LitElement {
       <div class="app-container">
         <header class="header">
           <h1>WhatsApp Export Viewer</h1>
-          <button 
-            class="theme-toggle" 
-            @click=${this.toggleTheme}
-            aria-label="Toggle theme"
-          >
-            ${document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'}
-          </button>
+      
         </header>
 
         <main class="main-content">
