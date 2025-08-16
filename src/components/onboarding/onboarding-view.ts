@@ -1,10 +1,37 @@
 import { LitElement, html, unsafeCSS } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import styles from './onboarding-view.scss?inline';
+import { chatStateService } from '../../utils/chat-state-service.js';
 
 @customElement('onboarding-view')
 export class OnboardingView extends LitElement {
   static styles = unsafeCSS(styles);
+
+  private isDragOver = false;
+
+  private handleDragOver(e: DragEvent): void {
+    e.preventDefault();
+    e.stopPropagation();
+    this.isDragOver = true;
+  }
+
+  private handleDragLeave(e: DragEvent): void {
+    e.preventDefault();
+    e.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  private handleDrop(e: DragEvent): void {
+    e.preventDefault();
+    e.stopPropagation();
+    this.isDragOver = false;
+
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      chatStateService.processFile(file);
+    }
+  }
 
   render() {
     return html`
@@ -19,7 +46,12 @@ export class OnboardingView extends LitElement {
         <main class="main-content">
           <h2 class="page-title">Get Started</h2>
           
-          <div class="upload-zone">
+          <div 
+            class="upload-zone ${this.isDragOver ? 'drag-over' : ''}"
+            @dragover=${this.handleDragOver}
+            @dragleave=${this.handleDragLeave}
+            @drop=${this.handleDrop}
+          >
             <svg class="upload-icon" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
               <path d="M10 9v3m0 0v3m0-3h3m-3 0H7"/>

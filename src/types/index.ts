@@ -61,6 +61,32 @@ export interface FileHandle {
   lastAccessed: Date;
 }
 
+// Chat model types
+export interface ChatRow {
+  id: string;
+  timestamp: Date;
+  sender: string;
+  content: string;
+  type: ChatRowType;
+  metadata?: ChatRowMetadata;
+}
+
+export interface ChatRowMetadata {
+  isSystemMessage: boolean;
+  hasAttachment: boolean;
+  attachmentType?: string;
+  quotedMessage?: string;
+  edited?: boolean;
+  deleted?: boolean;
+}
+
+export enum ChatRowType {
+  MESSAGE = 'message',
+  SYSTEM = 'system',
+  MEDIA = 'media',
+  STATUS = 'status'
+}
+
 // Parser configuration
 export interface ParserConfig {
   dateFormats: string[];
