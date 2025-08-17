@@ -1,44 +1,46 @@
 # WhatsApp Export Viewer
 
-A client-side web application for viewing WhatsApp chat exports in the browser. Built with Lit web components, SCSS, and Vite.
+A client-side web application for viewing WhatsApp chat exports in the browser. Built with Lit web components, TypeScript, SCSS, and Vite.
 
 ## Features
 
-- **Drag & Drop Support**: Upload WhatsApp export ZIP files via drag-and-drop or file input
-- **Multi-format Parsing**: Supports various date formats, multi-line messages, quoted messages, and system messages
-- **Media Display**: Extracts and displays images, videos, audio, stickers, and documents inline
-- **Virtualized Rendering**: Uses lit-virtualizer for smooth scrolling with large chat histories
-- **File System Access**: Persists folder/ZIP handles using the File System Access API and IndexedDB
-- **Responsive Design**: Works on desktop and mobile with light/dark theme support
-- **Client-side Only**: No server required - deploy as static files
+- **Drag & Drop Support**: Upload WhatsApp export ZIP files via drag-and-drop interface
+- **Multi-format Parsing**: Supports various date formats and message types from WhatsApp exports
+- **Media Display**: Extracts and displays images and documents inline from ZIP files
+- **Responsive Chat Interface**: Clean, WhatsApp-like chat interface with proper message bubbles
+- **Participant Management**: Select your own name to properly display message alignment
+- **Demo Mode**: Test the application with built-in demo chat data
+- **Client-side Only**: No server required - all processing happens in the browser
+- **TypeScript**: Full type safety with comprehensive type definitions
 
 ## Tech Stack
 
 - **Framework**: Lit (Web Components)
+- **Language**: TypeScript
 - **Build Tool**: Vite
 - **Styling**: SCSS (compiled to CSS)
-- **Virtualization**: lit-virtualizer
-- **File Handling**: JSZip, File System Access API
-- **Storage**: IndexedDB
+- **File Handling**: JSZip for ZIP file processing
+- **State Management**: Custom service with reactive updates
 
 ## Project Structure
 
 ```
 src/
 ├── components/          # Lit web components
-│   ├── file-import/     # File upload and ZIP handling
-│   ├── chat-parser/     # WhatsApp export parsing
-│   ├── message-renderer/ # Message display components
-│   └── ui/             # Common UI components
+│   ├── app/            # Main application component
+│   ├── chat-viewer/    # Chat display and toolbar components
+│   ├── onboarding/     # File upload and welcome screen
+│   └── ui/             # Common UI components (toolbar)
 ├── styles/             # SCSS files
-│   ├── variables.scss  # Theme variables
-│   ├── components/     # Component-specific styles
-│   └── main.scss       # Main stylesheet
+│   └── {components}/   # Component-specific styles
+├── types/              # TypeScript type definitions
+│   ├── index.ts        # Main type definitions
+│   └── scss.d.ts       # SCSS module types
 ├── utils/              # Utility functions
-│   ├── parser.ts       # Message parsing logic
-│   ├── storage.ts      # IndexedDB operations
-│   └── media.ts        # Media handling utilities
-└── types/              # TypeScript type definitions
+│   ├── chat-model.ts   # Chat data models
+│   ├── chat-parser.ts  # WhatsApp export parsing logic
+│   └── chat-state-service.ts # Application state management
+└── main.ts             # Application entry point
 ```
 
 ## Getting Started
@@ -75,9 +77,10 @@ npm run preview
 ## Usage
 
 1. **Export from WhatsApp**: In WhatsApp, go to Settings > Chats > Chat history > Export chat
-2. **Upload to Viewer**: Drag the ZIP file onto the app or use the file picker
-3. **View Chat**: The chat will load with all messages and media displayed
-4. **Persistent Access**: The app will remember your chat for future visits (if supported by browser)
+2. **Upload to Viewer**: Drag the ZIP file onto the upload zone or use the file picker
+3. **Set Your Name**: Select your name from the participant list to properly align messages
+4. **View Chat**: The chat will load with all messages and media displayed in a WhatsApp-like interface
+5. **Demo Mode**: Click "load demo chat" to test the application without uploading files
 
 ## Development
 
@@ -91,19 +94,27 @@ npm run preview
 
 ### Code Organization
 
-The project follows a vertical slice architecture:
+The project follows a component-based architecture:
 
-- **File Import**: Handles ZIP upload, extraction, and File System Access API
-- **Parsing**: Processes WhatsApp export format and extracts message data
-- **Rendering**: Displays messages with virtualization for performance
-- **Styling**: SCSS-based theming with CSS custom properties
-- **State Management**: Component state and IndexedDB persistence
+- **App Component**: Main application orchestrator and state management
+- **Onboarding**: File upload interface with drag-and-drop support
+- **Chat Viewer**: Message display with proper formatting and media support
+- **Chat Parser**: WhatsApp export format parsing and ZIP file handling
+- **State Service**: Centralized state management with reactive updates
+
+### Key Features Implementation
+
+- **File Processing**: Uses JSZip to extract and parse WhatsApp export ZIP files
+- **Message Parsing**: Regex-based parsing of WhatsApp chat format with support for various date formats
+- **Media Handling**: Extracts images and documents from ZIP files and displays them inline
+- **Responsive Design**: SCSS-based styling with proper mobile and desktop layouts
+- **Type Safety**: Comprehensive TypeScript types for all data structures
 
 ## Browser Support
 
-- Chrome/Edge 86+ (File System Access API support)
-- Firefox 90+ (limited File System Access API)
-- Safari 14+ (no File System Access API)
+- Chrome/Edge 86+
+- Firefox 90+
+- Safari 14+
 
 ## Deployment
 
