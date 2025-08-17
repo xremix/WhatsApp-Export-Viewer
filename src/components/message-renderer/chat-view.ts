@@ -48,17 +48,31 @@ export class ChatView {
     const isOwnMessage = message.sender === this.ownName;
     const messageClass = isOwnMessage ? 'own-message' : 'other-message';
     
-    // Handle image attachments
-    let imageHtml = '';
+    // Handle attachments
+    let attachmentHtml = '';
 
-    if (message.metadata?.hasAttachment && 
-        message.metadata?.attachmentType === 'image' as AttachmentType && 
-        message.metadata?.attachmentData) {
-      imageHtml = `
-        <div class="message-image">
-          <img src="${message.metadata.attachmentData}" alt="Attachment" />
-        </div>
-      `;
+    if (message.metadata?.hasAttachment && message.metadata?.attachmentData) {
+      if (message.metadata?.attachmentType === 'image' as AttachmentType) {
+        attachmentHtml = `
+          <div class="message-image">
+            <img src="${message.metadata.attachmentData}" alt="Attachment" />
+          </div>
+        `;
+      } else if (message.metadata?.attachmentType === 'document' as AttachmentType) {
+        // For documents, create a clickable link that opens in new tab
+        const filename = message.metadata.attachmentFilename || 'Document';
+        attachmentHtml = `
+          <div class="message-document">
+            <a href="${message.metadata.attachmentData}" target="_blank" rel="noopener noreferrer" class="document-link">
+              <div class="document-icon">📄</div>
+              <div class="document-info">
+                <div class="document-name">${this.escapeHtml(filename)}</div>
+                ${message.metadata.attachmentSize ? `<div class="document-size">${this.formatFileSize(message.metadata.attachmentSize)}</div>` : ''}
+              </div>
+            </a>
+          </div>
+        `;
+      }
     }
     
     const senderHtml = isOwnMessage ? '' : `
@@ -71,7 +85,7 @@ export class ChatView {
       <div class="message-wrapper ${messageClass}">
         <div class="message-bubble">
           ${senderHtml}
-          ${imageHtml}
+          ${attachmentHtml}
           <div class="message-content">
             ${this.processLinks(message.content)}
           </div>
@@ -128,5 +142,15 @@ export class ChatView {
     requestAnimationFrame(() => {
       this.container.scrollTop = this.container.scrollHeight;
     });
+  }
+
+  private formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 }

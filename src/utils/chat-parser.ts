@@ -288,6 +288,14 @@ export class ChatParser {
       metadata.attachmentFilename = imageAttachmentMatch[1].trim();
     }
 
+    // Check for document attachments in format <WHATEVER: filename.pdf/doc/docx/txt>
+    const documentAttachmentMatch = content.match(/<[^:]+:\s*([^>]+\.(pdf|doc|docx|txt|rtf|odt))>/i);
+    if (documentAttachmentMatch) {
+      metadata.hasAttachment = true;
+      metadata.attachmentType = 'document' as AttachmentType;
+      metadata.attachmentFilename = documentAttachmentMatch[1].trim();
+    }
+
     // Check for edited messages
     if (content.includes('(edited)')) {
       metadata.edited = true;
@@ -303,59 +311,81 @@ export class ChatParser {
   }
 
   /**
-   * Attach image files to chat rows that have image attachments
+   * Attach image and document files to chat rows that have attachments
    */
   private static async attachImages(chatRows: ChatRow[], zipContent: JSZip): Promise<void> {
-    // Get all image files from the ZIP
+    // Get all image and document files from the ZIP
     const imageFiles = new Map<string, JSZip.JSZipObject>();
+    const documentFiles = new Map<string, JSZip.JSZipObject>();
     
     zipContent.forEach((relativePath, zipEntry) => {
       const lowerName = zipEntry.name.toLowerCase();
       if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png')) {
         imageFiles.set(zipEntry.name, zipEntry);
+      } else if (lowerName.endsWith('.pdf') || lowerName.endsWith('.doc') || lowerName.endsWith('.docx') || 
+                 lowerName.endsWith('.txt') || lowerName.endsWith('.rtf') || lowerName.endsWith('.odt')) {
+        documentFiles.set(zipEntry.name, zipEntry);
       }
     });
 
-    // Process each chat row that has an image attachment
+    // Process each chat row that has an attachment
     for (const row of chatRows) {
-      if (row.metadata?.hasAttachment && 
-          row.metadata?.attachmentType === 'image' as AttachmentType && 
-          row.metadata?.attachmentFilename) {
-        
+      if (row.metadata?.hasAttachment && row.metadata?.attachmentFilename) {
         const filename = row.metadata.attachmentFilename;
-        
-        // Try to find the image file (fuzzy matching)
         let foundFile: JSZip.JSZipObject | null = null;
         
-        // First try exact match
-        if (imageFiles.has(filename)) {
-          foundFile = imageFiles.get(filename)!;
-        } else {
-          // Try fuzzy matching - look for files that contain the filename
-          for (const [zipFileName, zipEntry] of imageFiles) {
-            if (zipFileName.includes(filename) || filename.includes(zipFileName)) {
-              foundFile = zipEntry;
-              break;
+        if (row.metadata?.attachmentType === 'image' as AttachmentType) {
+          // Try to find the image file (fuzzy matching)
+          // First try exact match
+          if (imageFiles.has(filename)) {
+            foundFile = imageFiles.get(filename)!;
+          } else {
+            // Try fuzzy matching - look for files that contain the filename
+            for (const [zipFileName, zipEntry] of imageFiles) {
+              if (zipFileName.includes(filename) || filename.includes(zipFileName)) {
+                foundFile = zipEntry;
+                break;
+              }
+            }
+          }
+        } else if (row.metadata?.attachmentType === 'document' as AttachmentType) {
+          // Try to find the document file (fuzzy matching)
+          // First try exact match
+          if (documentFiles.has(filename)) {
+            foundFile = documentFiles.get(filename)!;
+          } else {
+            // Try fuzzy matching - look for files that contain the filename
+            for (const [zipFileName, zipEntry] of documentFiles) {
+              if (zipFileName.includes(filename) || filename.includes(zipFileName)) {
+                foundFile = zipEntry;
+                break;
+              }
             }
           }
         }
         
         if (foundFile) {
           try {
-            // Extract the image as a blob
-            const imageBlob = await foundFile.async('blob');
+            // Extract the file as a blob
+            const fileBlob = await foundFile.async('blob');
             
-            // Create a data URL for the image
-            const imageUrl = URL.createObjectURL(imageBlob);
+            // Determine the correct MIME type based on file extension
+            const mimeType = this.getMimeType(filename);
             
-            // Store the image data in the row
-            row.metadata!.attachmentData = imageUrl;
-            row.metadata!.attachmentSize = imageBlob.size;
+            // Create a new blob with the correct MIME type
+            const typedBlob = new Blob([fileBlob], { type: mimeType });
+            
+            // Create a blob URL for the file
+            const fileUrl = URL.createObjectURL(typedBlob);
+            
+            // Store the file data in the row
+            row.metadata!.attachmentData = fileUrl;
+            row.metadata!.attachmentSize = fileBlob.size;
           } catch (error) {
-            console.warn(`Failed to extract image ${filename}:`, error);
+            console.warn(`Failed to extract file ${filename}:`, error);
           }
         } else {
-          console.warn(`Image file not found in ZIP: ${filename}`);
+          console.warn(`File not found in ZIP: ${filename}`);
         }
       }
     }
@@ -366,5 +396,34 @@ export class ChatParser {
    */
   private static generateId(): string {
     return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Get MIME type based on file extension
+   */
+  private static getMimeType(filename: string): string {
+    const extension = filename.toLowerCase().split('.').pop();
+    
+    switch (extension) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'doc':
+        return 'application/msword';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'txt':
+        return 'text/plain';
+      case 'rtf':
+        return 'application/rtf';
+      case 'odt':
+        return 'application/vnd.oasis.opendocument.text';
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      default:
+        return 'application/octet-stream';
+    }
   }
 }
