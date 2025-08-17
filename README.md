@@ -9,9 +9,11 @@ A client-side web application for viewing WhatsApp chat exports in the browser. 
 - **Media Display**: Extracts and displays images and documents inline from ZIP files
 - **Responsive Chat Interface**: Clean, WhatsApp-like chat interface with proper message bubbles
 - **Participant Management**: Select your own name to properly display message alignment
+- **Search Functionality**: Search through messages with next/previous navigation
 - **Demo Mode**: Test the application with built-in demo chat data
 - **Client-side Only**: No server required - all processing happens in the browser
 - **TypeScript**: Full type safety with comprehensive type definitions
+- **Tutorial Support**: Built-in tutorials for Android and iPhone export processes
 
 ## Tech Stack
 
@@ -20,34 +22,44 @@ A client-side web application for viewing WhatsApp chat exports in the browser. 
 - **Build Tool**: Vite
 - **Styling**: SCSS (compiled to CSS)
 - **File Handling**: JSZip for ZIP file processing
+- **Virtual Scrolling**: lit-virtualizer for performance
 - **State Management**: Custom service with reactive updates
 
 ## Project Structure
 
+The project follows a **vertical slice architecture** pattern, where each feature is self-contained with its own components, styles, and logic. This approach promotes maintainability and reduces coupling between different parts of the application.
+
 ```
 src/
-├── components/          # Lit web components
-│   ├── app/            # Main application component
-│   ├── chat-viewer/    # Chat display and toolbar components
-│   ├── onboarding/     # File upload and welcome screen
-│   └── ui/             # Common UI components (toolbar)
-├── styles/             # SCSS files
-│   └── {components}/   # Component-specific styles
+├── components/          # Lit web components organized by feature
+│   ├── app/            # Main application orchestrator
+│   ├── chat-viewer/    # Chat display and interaction features
+│   ├── onboarding/     # File upload and tutorial features
+│   └── ui/             # Shared UI components
 ├── types/              # TypeScript type definitions
-│   ├── index.ts        # Main type definitions
-│   └── scss.d.ts       # SCSS module types
-├── utils/              # Utility functions
-│   ├── chat-model.ts   # Chat data models
-│   ├── chat-parser.ts  # WhatsApp export parsing logic
-│   └── chat-state-service.ts # Application state management
+├── utils/              # Core business logic and services
 └── main.ts             # Application entry point
 ```
+
+### Architecture Principles
+
+- **Vertical Slices**: Each feature (chat-viewer, onboarding) contains all related components, styles, and logic
+- **Feature Isolation**: Features are self-contained and can be developed independently
+- **Shared Components**: Common UI elements are extracted to the `ui/` directory
+- **Type Safety**: Centralized type definitions ensure consistency across features
+- **State Management**: Centralized state service with reactive updates
+
+### Feature Organization
+
+- **App Layer**: Orchestrates the overall application flow and manages global state
+- **Feature Layers**: Each feature (chat-viewer, onboarding) contains its complete implementation
+- **Shared Layer**: Common utilities, types, and UI components used across features
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Installation
@@ -80,7 +92,8 @@ npm run preview
 2. **Upload to Viewer**: Drag the ZIP file onto the upload zone or use the file picker
 3. **Set Your Name**: Select your name from the participant list to properly align messages
 4. **View Chat**: The chat will load with all messages and media displayed in a WhatsApp-like interface
-5. **Demo Mode**: Click "load demo chat" to test the application without uploading files
+5. **Search Messages**: Use the search functionality to find specific messages
+6. **Demo Mode**: Click "load demo chat" to test the application without uploading files
 
 ## Development
 
@@ -96,42 +109,30 @@ npm run preview
 
 The project follows a component-based architecture:
 
-- **App Component**: Main application orchestrator and state management
-- **Onboarding**: File upload interface with drag-and-drop support
-- **Chat Viewer**: Message display with proper formatting and media support
-- **Chat Parser**: WhatsApp export format parsing and ZIP file handling
-- **State Service**: Centralized state management with reactive updates
+- **App Component** (`whatsapp-viewer-app.ts`): Main application orchestrator and state management
+- **Onboarding** (`onboarding-view.ts`): File upload interface with drag-and-drop support
+- **Chat Viewer** (`chat-view.ts`): Message display with proper formatting, media support, and search functionality
+- **Chat Parser** (`chat-parser.ts`): WhatsApp export format parsing and ZIP file handling
+- **State Service** (`chat-state-service.ts`): Centralized state management with reactive updates
 
 ### Key Features Implementation
 
 - **File Processing**: Uses JSZip to extract and parse WhatsApp export ZIP files
 - **Message Parsing**: Regex-based parsing of WhatsApp chat format with support for various date formats
 - **Media Handling**: Extracts images and documents from ZIP files and displays them inline
+- **Search System**: Full-text search with result highlighting and navigation
 - **Responsive Design**: SCSS-based styling with proper mobile and desktop layouts
 - **Type Safety**: Comprehensive TypeScript types for all data structures
+- **Tutorial System**: Built-in guides for Android and iPhone export processes
 
-## Browser Support
+### Component Architecture
 
-- Chrome/Edge 86+
-- Firefox 90+
-- Safari 14+
-
-## Deployment
-
-The app can be deployed to any static hosting service:
-
-- GitHub Pages
-- Netlify
-- Vercel
-- AWS S3 + CloudFront
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- **Main App**: Orchestrates the overall application flow and manages state
+- **Onboarding**: Handles file uploads with drag-and-drop and tutorial access
+- **Chat Viewer**: Renders messages with proper alignment, media display, and search
+- **Chat Toolbar**: Provides participant selection and chat controls
+- **Top Toolbar**: Navigation and search interface
+- **Tutorial Views**: Step-by-step guides for different export methods
 
 ## License
 

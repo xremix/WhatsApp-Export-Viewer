@@ -36,6 +36,7 @@ top-toolbar {
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  padding-bottom: 6rem;
   text-align: center;
 }
 
@@ -140,7 +141,7 @@ top-toolbar {
 }
 
 .scroll-indicator {
-  position: fixed;
+  position: absolute;
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
@@ -148,6 +149,7 @@ top-toolbar {
   align-items: center;
   color: #6b7280;
   font-size: 0.875rem;
+  z-index: 10;
 }
 
 .scroll-icon {
