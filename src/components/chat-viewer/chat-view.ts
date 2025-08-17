@@ -6,6 +6,7 @@ export class ChatView {
   private ownName: string;
   private currentSearchIndex: number = -1;
   private searchResults: number[] = [];
+  private lastSearchTerm: string = '';
 
   constructor(container: HTMLElement, ownName: string) {
     this.container = container;
@@ -29,24 +30,27 @@ export class ChatView {
       return 0;
     }
 
-    this.searchResults = [];
-    const term = searchTerm.toLowerCase();
-
-    // Find all messages containing the search term
-    this.messages.forEach((message, index) => {
-      const content = message.content.toLowerCase();
-      const sender = message.sender.toLowerCase();
+    // Only reset search if the term has changed
+    if (searchTerm !== this.lastSearchTerm) {
+      this.searchResults = [];
+      this.currentSearchIndex = -1;
+      this.lastSearchTerm = searchTerm;
       
-      if (content.includes(term) || sender.includes(term)) {
-        this.searchResults.push(index);
-      }
-    });
+      const term = searchTerm.toLowerCase();
 
-    // Reset current search index
-    this.currentSearchIndex = -1;
+      // Find all messages containing the search term
+      this.messages.forEach((message, index) => {
+        const content = message.content.toLowerCase();
+        const sender = message.sender.toLowerCase();
+        
+        if (content.includes(term) || sender.includes(term)) {
+          this.searchResults.push(index);
+        }
+      });
 
-    // Highlight search results
-    this.highlightSearchResults();
+      // Highlight search results
+      this.highlightSearchResults();
+    }
 
     return this.searchResults.length;
   }
@@ -92,6 +96,7 @@ export class ChatView {
   clearSearch() {
     this.searchResults = [];
     this.currentSearchIndex = -1;
+    this.lastSearchTerm = '';
     this.removeSearchHighlights();
   }
 

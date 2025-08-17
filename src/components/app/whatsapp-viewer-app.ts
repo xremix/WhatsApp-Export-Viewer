@@ -206,7 +206,7 @@ export class WhatsAppViewerApp extends LitElement {
     
     if (this.chatView) {
       if (searchTerm.trim()) {
-        // First, perform the search if not already done
+        // Perform the search (this won't reset index if term hasn't changed)
         const resultCount = this.chatView.searchMessages(searchTerm);
         // Then move to next result
         const found = this.chatView.searchNext();
@@ -217,7 +217,6 @@ export class WhatsAppViewerApp extends LitElement {
         // Update toolbar with current search position
         const chatToolbar = this.shadowRoot?.getElementById('chat-toolbar') as any;
         if (chatToolbar) {
-          // Get current search index from chat view (we'll need to add a getter)
           const currentIndex = this.chatView.getCurrentSearchIndex();
           chatToolbar.updateSearchResults(resultCount, currentIndex);
         }
@@ -230,7 +229,7 @@ export class WhatsAppViewerApp extends LitElement {
 
     if (this.chatView) {
       if (searchTerm.trim()) {
-        // First, perform the search if not already done
+        // Perform the search (this won't reset index if term hasn't changed)
         const resultCount = this.chatView.searchMessages(searchTerm);
         // Then move to previous result
         const found = this.chatView.searchPrevious();
@@ -241,7 +240,6 @@ export class WhatsAppViewerApp extends LitElement {
         // Update toolbar with current search position
         const chatToolbar = this.shadowRoot?.getElementById('chat-toolbar') as any;
         if (chatToolbar) {
-          // Get current search index from chat view (we'll need to add a getter)
           const currentIndex = this.chatView.getCurrentSearchIndex();
           chatToolbar.updateSearchResults(resultCount, currentIndex);
         }
