@@ -59,18 +59,6 @@ export class ChatToolbar extends LitElement {
         box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.25);
       }
     }
-
-    .right-section {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .info-text {
-      font-size: 0.75rem;
-      color: #6c757d;
-      margin: 0;
-    }
   `;
 
   private participants: string[] = [];
@@ -112,7 +100,7 @@ export class ChatToolbar extends LitElement {
     return html`
       <div class="toolbar">
         <div class="left-section">
-          <label class="label">Your name:</label>
+          <label class="label">You:</label>
           <div class="select-container">
             <select 
               class="select" 
@@ -124,11 +112,6 @@ export class ChatToolbar extends LitElement {
               )}
             </select>
           </div>
-        </div>
-        <div class="right-section">
-          <p class="info-text">
-            Messages from selected name will appear on the right
-          </p>
         </div>
       </div>
     `;
