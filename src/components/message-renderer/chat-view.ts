@@ -16,6 +16,11 @@ export class ChatView {
     this.render();
   }
 
+  updateOwnName(ownName: string) {
+    this.ownName = ownName;
+    this.render();
+  }
+
   private render() {
     const messagesHtml = this.messages.map(message => this.createMessageHtml(message)).join('');
     

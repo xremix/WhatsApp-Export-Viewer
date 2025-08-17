@@ -5,6 +5,7 @@ import { chatStateService } from '../../utils/chat-state-service.js';
 import { AppState, ChatRow, MessageType } from '../../types/index.js';
 import { ChatView } from '../message-renderer/index.js';
 import '../ui/top-toolbar';
+import '../ui/chat-toolbar';
 import { createDemoChat } from '../message-renderer/index.js';
 
 
@@ -108,6 +109,20 @@ export class WhatsAppViewerApp extends LitElement {
   private chatView: ChatView | null = null;
   private unsubscribe: (() => void) | null = null;
 
+  // Get unique participants from messages
+  private getUniqueParticipants(): string[] {
+    const participants = [...new Set(this.appState.messages.map(msg => msg.sender))]
+      .filter(name => name.trim() !== '' && !name.includes('System'))
+      .sort();
+    
+    // Set default own name if none is selected and we have participants
+    if (!this.appState.ownName && participants.length > 0) {
+      chatStateService.setOwnName(participants[0]);
+    }
+    
+    return participants;
+  }
+
   constructor() {
     super();
   }
@@ -158,6 +173,10 @@ export class WhatsAppViewerApp extends LitElement {
               @search-click=${this.handleSearchClick}
               @menu-click=${this.handleMenuClick}
             ></top-toolbar>
+            <chat-toolbar
+              id="chat-toolbar"
+              @own-name-change=${this.handleOwnNameChange}
+            ></chat-toolbar>
             <div id="chat-container" class="chat-view-container"></div>
           </div>
         `
@@ -176,28 +195,35 @@ export class WhatsAppViewerApp extends LitElement {
   updated(changedProperties: Map<string, unknown>) {
     super.updated(changedProperties);
     
-          // Initialize chat view when messages are available
-      if (this.appState.messages.length > 0 && !this.chatView) {
-        const chatContainer = this.shadowRoot?.getElementById('chat-container');
-        if (chatContainer) {
-          this.chatView = new ChatView(chatContainer, this.appState.ownName);
-          
-          // Convert messages to ChatRow format
-          const chatRows: ChatRow[] = this.appState.messages.map(msg => ({
-            id: msg.id,
-            timestamp: msg.timestamp,
-            sender: msg.sender,
-            content: msg.content,
-            type: msg.type as any,
-            metadata: {
-              isSystemMessage: msg.isSystemMessage,
-              hasAttachment: msg.attachments.length > 0
-            }
-          }));
-          
-          this.chatView.setMessages(chatRows);
-        }
+    // Update chat toolbar with current data
+    const chatToolbar = this.shadowRoot?.getElementById('chat-toolbar') as any;
+    if (chatToolbar) {
+      chatToolbar.setParticipants(this.getUniqueParticipants());
+      chatToolbar.setSelectedOwnName(this.appState.ownName);
+    }
+    
+    // Initialize chat view when messages are available
+    if (this.appState.messages.length > 0 && !this.chatView) {
+      const chatContainer = this.shadowRoot?.getElementById('chat-container');
+      if (chatContainer) {
+        this.chatView = new ChatView(chatContainer, this.appState.ownName);
+        
+        // Convert messages to ChatRow format
+        const chatRows: ChatRow[] = this.appState.messages.map(msg => ({
+          id: msg.id,
+          timestamp: msg.timestamp,
+          sender: msg.sender,
+          content: msg.content,
+          type: msg.type as any,
+          metadata: {
+            isSystemMessage: msg.isSystemMessage,
+            hasAttachment: msg.attachments.length > 0
+          }
+        }));
+        
+        this.chatView.setMessages(chatRows);
       }
+    }
   }
 
   private handleBackClick() {
@@ -213,6 +239,16 @@ export class WhatsAppViewerApp extends LitElement {
   private handleMenuClick() {
     // TODO: Implement menu functionality
     console.log('Menu clicked');
+  }
+
+  private handleOwnNameChange(event: CustomEvent) {
+    const { ownName } = event.detail;
+    chatStateService.setOwnName(ownName);
+    
+    // Update the chat view with the new own name
+    if (this.chatView) {
+      this.chatView.updateOwnName(ownName);
+    }
   }
 
   private loadDemoData() {
