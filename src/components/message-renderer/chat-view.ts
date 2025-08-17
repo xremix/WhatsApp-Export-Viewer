@@ -3,9 +3,11 @@ import { ChatRow } from '../../types/index.js';
 export class ChatView {
   private container: HTMLElement;
   private messages: ChatRow[] = [];
+  private ownName: string;
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, ownName: string) {
     this.container = container;
+    this.ownName = ownName;
     this.render();
   }
 
@@ -35,7 +37,7 @@ export class ChatView {
       `;
     }
 
-    const isOwnMessage = message.sender === 'You' || message.sender === 'Me';
+    const isOwnMessage = message.sender === this.ownName;
     const messageClass = isOwnMessage ? 'own-message' : 'other-message';
     
     return `

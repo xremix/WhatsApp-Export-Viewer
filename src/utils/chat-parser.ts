@@ -111,6 +111,23 @@ export class ChatParser {
   }
 
   /**
+   * Automatically identify the own name (second unique sender) from chat messages
+   * @param rows - Array of ChatRow objects
+   * @returns The own name (second unique sender)
+   */
+  static identifyOwnName(rows: ChatRow[]): string {
+    // Get unique senders (excluding system messages)
+    const senders = [...new Set(
+      rows
+        .filter(row => !row.metadata?.isSystemMessage)
+        .map(row => row.sender)
+    )];
+    
+    // Return the second sender if available, otherwise the first
+    return senders.length >= 2 ? senders[1] : senders[0] || 'Unknown';
+  }
+
+  /**
    * Split messages that contain embedded timestamp patterns
    * @param rows - Array of ChatRow objects
    * @returns Array of ChatRow objects with embedded messages split

@@ -7,7 +7,8 @@ class ChatStateService {
     isLoading: false,
     error: null,
     chatTitle: '',
-    hasPersistedData: false
+    hasPersistedData: false,
+    ownName: ''
   };
 
   private listeners: Set<(state: AppState) => void> = new Set();
@@ -75,6 +76,11 @@ class ChatStateService {
     this.updateState({ chatTitle: title });
   }
 
+  // Action: Set own name
+  setOwnName(ownName: string): void {
+    this.updateState({ ownName });
+  }
+
   // Action: Reset state
   reset(): void {
     this.updateState({
@@ -82,7 +88,8 @@ class ChatStateService {
       isLoading: false,
       error: null,
       chatTitle: '',
-      hasPersistedData: false
+      hasPersistedData: false,
+      ownName: ''
     });
   }
 
@@ -132,6 +139,9 @@ class ChatStateService {
       // Use the chat parser to process the ZIP file
       const chatRows = await ChatParser.parseZipFile(file);
       
+      // Identify the own name (second unique sender)
+      const ownName = ChatParser.identifyOwnName(chatRows);
+      
       // Set chat title based on the file name
       this.setChatTitle(file.name.replace('.zip', ''));
       
@@ -149,6 +159,7 @@ class ChatStateService {
       }));
       
       this.setMessages(messages);
+      this.updateState({ ownName });
       
     } catch (error) {
       this.setError(error instanceof Error ? error.message : 'Failed to process file');

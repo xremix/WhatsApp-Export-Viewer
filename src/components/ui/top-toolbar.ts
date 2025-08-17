@@ -15,7 +15,7 @@ export class TopToolbar extends LitElement {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 4rem;
+      min-height: 2rem;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       width: 100%;
       position: relative;

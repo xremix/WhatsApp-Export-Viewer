@@ -176,28 +176,28 @@ export class WhatsAppViewerApp extends LitElement {
   updated(changedProperties: Map<string, unknown>) {
     super.updated(changedProperties);
     
-    // Initialize chat view when messages are available
-    if (this.appState.messages.length > 0 && !this.chatView) {
-      const chatContainer = this.shadowRoot?.getElementById('chat-container');
-      if (chatContainer) {
-        this.chatView = new ChatView(chatContainer);
-        
-        // Convert messages to ChatRow format
-        const chatRows: ChatRow[] = this.appState.messages.map(msg => ({
-          id: msg.id,
-          timestamp: msg.timestamp,
-          sender: msg.sender,
-          content: msg.content,
-          type: msg.type as any,
-          metadata: {
-            isSystemMessage: msg.isSystemMessage,
-            hasAttachment: msg.attachments.length > 0
-          }
-        }));
-        
-        this.chatView.setMessages(chatRows);
+          // Initialize chat view when messages are available
+      if (this.appState.messages.length > 0 && !this.chatView) {
+        const chatContainer = this.shadowRoot?.getElementById('chat-container');
+        if (chatContainer) {
+          this.chatView = new ChatView(chatContainer, this.appState.ownName);
+          
+          // Convert messages to ChatRow format
+          const chatRows: ChatRow[] = this.appState.messages.map(msg => ({
+            id: msg.id,
+            timestamp: msg.timestamp,
+            sender: msg.sender,
+            content: msg.content,
+            type: msg.type as any,
+            metadata: {
+              isSystemMessage: msg.isSystemMessage,
+              hasAttachment: msg.attachments.length > 0
+            }
+          }));
+          
+          this.chatView.setMessages(chatRows);
+        }
       }
-    }
   }
 
   private handleBackClick() {
@@ -252,5 +252,6 @@ export class WhatsAppViewerApp extends LitElement {
     
     chatStateService.setMessages(demoMessages);
     chatStateService.setChatTitle('Demo Chat');
+    chatStateService.setOwnName('You');
   }
 }

@@ -51,6 +51,7 @@ export interface AppState {
   error: string | null;
   chatTitle: string;
   hasPersistedData: boolean;
+  ownName: string;
 }
 
 // File handling
