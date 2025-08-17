@@ -39,9 +39,6 @@ export class ChatParser {
       // Parse the text content into ChatRow objects
       const chatRows = ChatParser.parseFromText(textContent);
       
-      // Show alert with parsing results
-      alert(`Found text file: ${firstTextFile}\nParsed ${chatRows.length} chat messages successfully!`);
-      
       return chatRows;
       
     } catch (error) {
