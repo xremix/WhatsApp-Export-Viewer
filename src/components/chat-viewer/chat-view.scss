@@ -24,6 +24,24 @@
     justify-content: center;
     margin: 16px 0;
   }
+
+  // Search highlighting styles
+  &.search-result {
+    .message-bubble {
+      background-color: #fff3cd;
+      border: 2px solid #ffc107;
+      animation: searchPulse 0.5s ease-in-out;
+    }
+  }
+
+  &.search-current {
+    .message-bubble {
+      background-color: #d1ecf1;
+      border: 2px solid #17a2b8;
+      animation: searchCurrentPulse 0.8s ease-in-out;
+      box-shadow: 0 0 10px rgba(23, 162, 184, 0.3);
+    }
+  }
 }
 
 .message-bubble {
@@ -162,5 +180,32 @@
         color: #6c757d;
       }
     }
+  }
+}
+
+@keyframes searchPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes searchCurrentPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(23, 162, 184, 0.3);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 15px rgba(23, 162, 184, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(23, 162, 184, 0.3);
   }
 }

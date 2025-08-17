@@ -4,6 +4,8 @@ export class ChatView {
   private container: HTMLElement;
   private messages: ChatRow[] = [];
   private ownName: string;
+  private currentSearchIndex: number = -1;
+  private searchResults: number[] = [];
 
   constructor(container: HTMLElement, ownName: string) {
     this.container = container;
@@ -21,6 +23,131 @@ export class ChatView {
     this.render();
   }
 
+  searchMessages(searchTerm: string): number {
+    if (!searchTerm.trim()) {
+      this.clearSearch();
+      return 0;
+    }
+
+    this.searchResults = [];
+    const term = searchTerm.toLowerCase();
+
+    // Find all messages containing the search term
+    this.messages.forEach((message, index) => {
+      const content = message.content.toLowerCase();
+      const sender = message.sender.toLowerCase();
+      
+      if (content.includes(term) || sender.includes(term)) {
+        this.searchResults.push(index);
+      }
+    });
+
+    // Reset current search index
+    this.currentSearchIndex = -1;
+
+    // Highlight search results
+    this.highlightSearchResults();
+
+    return this.searchResults.length;
+  }
+
+  searchNext(): boolean {
+    if (this.searchResults.length === 0) {
+      return false;
+    }
+
+    // Move to next result
+    this.currentSearchIndex = (this.currentSearchIndex + 1) % this.searchResults.length;
+    const messageIndex = this.searchResults[this.currentSearchIndex];
+    
+    // Scroll to the message
+    this.scrollToMessage(messageIndex);
+    
+    // Update highlighting
+    this.highlightSearchResults();
+    
+    return true;
+  }
+
+  searchPrevious(): boolean {
+    if (this.searchResults.length === 0) {
+      return false;
+    }
+
+    // Move to previous result
+    this.currentSearchIndex = this.currentSearchIndex <= 0 
+      ? this.searchResults.length - 1 
+      : this.currentSearchIndex - 1;
+    const messageIndex = this.searchResults[this.currentSearchIndex];
+    
+    // Scroll to the message
+    this.scrollToMessage(messageIndex);
+    
+    // Update highlighting
+    this.highlightSearchResults();
+    
+    return true;
+  }
+
+  clearSearch() {
+    this.searchResults = [];
+    this.currentSearchIndex = -1;
+    this.removeSearchHighlights();
+  }
+
+  getCurrentSearchIndex(): number {
+    return this.currentSearchIndex;
+  }
+
+  private highlightSearchResults() {
+    this.removeSearchHighlights();
+    
+    if (this.searchResults.length === 0) {
+      return;
+    }
+
+    const messageElements = this.container.querySelectorAll('.message-wrapper');
+    
+    // Highlight all search results
+    this.searchResults.forEach(index => {
+      if (messageElements[index]) {
+        messageElements[index].classList.add('search-result');
+      }
+    });
+
+    // Highlight current result
+    if (this.currentSearchIndex >= 0 && this.currentSearchIndex < this.searchResults.length) {
+      const currentIndex = this.searchResults[this.currentSearchIndex];
+      if (messageElements[currentIndex]) {
+        messageElements[currentIndex].classList.add('search-current');
+      }
+    }
+  }
+
+  private removeSearchHighlights() {
+    const messageElements = this.container.querySelectorAll('.message-wrapper');
+    messageElements.forEach(element => {
+      element.classList.remove('search-result', 'search-current');
+    });
+  }
+
+  private scrollToMessage(messageIndex: number) {
+    const messageElements = this.container.querySelectorAll('.message-wrapper');
+    const targetElement = messageElements[messageIndex] as HTMLElement;
+    
+    if (targetElement) {
+      // Calculate the scroll position to center the message
+      const containerRect = this.container.getBoundingClientRect();
+      const elementRect = targetElement.getBoundingClientRect();
+      const scrollTop = targetElement.offsetTop - containerRect.height / 2 + elementRect.height / 2;
+      
+      this.container.scrollTo({
+        top: scrollTop,
+        behavior: 'smooth'
+      });
+    }
+  }
+
   private render() {
     const messagesHtml = this.messages.map(message => this.createMessageHtml(message)).join('');
     
@@ -32,6 +159,11 @@ export class ChatView {
     
     // Scroll to the bottom after rendering
     this.scrollToBottom();
+    
+    // Re-apply search highlighting if there are active search results
+    if (this.searchResults.length > 0) {
+      this.highlightSearchResults();
+    }
   }
 
   private createMessageHtml(message: ChatRow): string {

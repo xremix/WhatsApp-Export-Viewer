@@ -27,6 +27,50 @@ export class ChatToolbar extends LitElement {
       gap: 1rem;
     }
 
+    .search-container {
+      position: relative;
+    }
+
+    .search-input {
+      background-color: white;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      color: #495057;
+      min-width: 200px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        border-color: #adb5bd;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: #25d366;
+        box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.25);
+      }
+
+      &::placeholder {
+        color: #6c757d;
+      }
+    }
+
+    .search-results {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #25d366;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      min-width: 2rem;
+      text-align: center;
+    }
+
     .label {
       font-size: 0.875rem;
       color: #6c757d;
@@ -63,6 +107,9 @@ export class ChatToolbar extends LitElement {
 
   private participants: string[] = [];
   private selectedOwnName: string = '';
+  private searchTerm: string = '';
+  private searchResultCount: number = 0;
+  private currentSearchIndex: number = -1;
 
   setParticipants(participants: string[]) {
     this.participants = participants;
@@ -74,15 +121,102 @@ export class ChatToolbar extends LitElement {
     this.requestUpdate();
   }
 
+  updateSearchResults(count: number, currentIndex: number = -1) {
+    this.searchResultCount = count;
+    this.currentSearchIndex = currentIndex;
+    this.requestUpdate();
+  }
+
   private handleOwnNameChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     this.selectedOwnName = select.value;
     this.dispatchOwnNameChange();
   }
 
+  private handleSearchInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchTerm = input.value;
+    this.dispatchSearchChange();
+  }
+
+  private handleSearchKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      this.dispatchSearchNext();
+    } else if (event.key === 'Escape') {
+      // Clear search on escape
+      this.searchTerm = '';
+      this.dispatchSearchChange();
+      (event.target as HTMLInputElement).value = '';
+    }
+  }
+
+  private handleGlobalKeydown(event: KeyboardEvent) {
+    // Ctrl+F to focus search
+    if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+      event.preventDefault();
+      const searchInput = this.shadowRoot?.querySelector('.search-input') as HTMLInputElement;
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    }
+    
+    // Ctrl+G to go to next search result
+    if ((event.ctrlKey || event.metaKey) && event.key === 'g' && !event.shiftKey) {
+      event.preventDefault();
+      if (this.searchTerm.trim()) {
+        this.dispatchSearchNext();
+      }
+    }
+    
+    // Ctrl+Shift+G to go to previous search result
+    if ((event.ctrlKey || event.metaKey) && event.key === 'G' && event.shiftKey) {
+      event.preventDefault();
+      if (this.searchTerm.trim()) {
+        this.dispatchSearchPrevious();
+      }
+    }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    // Add global keyboard listener
+    document.addEventListener('keydown', this.handleGlobalKeydown.bind(this));
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    // Remove global keyboard listener
+    document.removeEventListener('keydown', this.handleGlobalKeydown.bind(this));
+  }
+
   private dispatchOwnNameChange() {
     this.dispatchEvent(new CustomEvent('own-name-change', {
       detail: { ownName: this.selectedOwnName },
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+  private dispatchSearchChange() {
+    this.dispatchEvent(new CustomEvent('search-change', {
+      detail: { searchTerm: this.searchTerm },
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+  private dispatchSearchNext() {
+    this.dispatchEvent(new CustomEvent('search-next', {
+      detail: { searchTerm: this.searchTerm },
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+  private dispatchSearchPrevious() {
+    this.dispatchEvent(new CustomEvent('search-previous', {
+      detail: { searchTerm: this.searchTerm },
       bubbles: true,
       composed: true
     }));
@@ -100,6 +234,21 @@ export class ChatToolbar extends LitElement {
     return html`
       <div class="toolbar">
         <div class="left-section">
+          <div class="search-container">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Search messages..."
+              .value=${this.searchTerm}
+              @input=${this.handleSearchInput}
+              @keydown=${this.handleSearchKeydown}
+            />
+            ${this.searchResultCount > 0 ? html`
+              <div class="search-results">
+                ${this.currentSearchIndex >= 0 ? `${this.currentSearchIndex + 1}` : '0'} of ${this.searchResultCount}
+              </div>
+            ` : ''}
+          </div>
           <label class="label">You:</label>
           <div class="select-container">
             <select 

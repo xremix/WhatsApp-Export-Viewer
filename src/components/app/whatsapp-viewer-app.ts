@@ -98,6 +98,9 @@ export class WhatsAppViewerApp extends LitElement {
             <chat-toolbar
               id="chat-toolbar"
               @own-name-change=${this.handleOwnNameChange}
+              @search-change=${this.handleSearchChange}
+              @search-next=${this.handleSearchNext}
+              @search-previous=${this.handleSearchPrevious}
             ></chat-toolbar>
             <div id="chat-container" class="chat-view-container"></div>
           </div>
@@ -183,6 +186,69 @@ export class WhatsAppViewerApp extends LitElement {
     }
   }
 
+  private handleSearchChange(event: CustomEvent) {
+    const { searchTerm } = event.detail;
+    
+    if (this.chatView) {
+      const resultCount = this.chatView.searchMessages(searchTerm);
+      console.log(`Found ${resultCount} messages containing "${searchTerm}"`);
+      
+      // Update toolbar with search results
+      const chatToolbar = this.shadowRoot?.getElementById('chat-toolbar') as any;
+      if (chatToolbar) {
+        chatToolbar.updateSearchResults(resultCount, -1);
+      }
+    }
+  }
+
+  private handleSearchNext(event: CustomEvent) {
+    const { searchTerm } = event.detail;
+    
+    if (this.chatView) {
+      if (searchTerm.trim()) {
+        // First, perform the search if not already done
+        const resultCount = this.chatView.searchMessages(searchTerm);
+        // Then move to next result
+        const found = this.chatView.searchNext();
+        if (!found) {
+          console.log('No search results found');
+        }
+        
+        // Update toolbar with current search position
+        const chatToolbar = this.shadowRoot?.getElementById('chat-toolbar') as any;
+        if (chatToolbar) {
+          // Get current search index from chat view (we'll need to add a getter)
+          const currentIndex = this.chatView.getCurrentSearchIndex();
+          chatToolbar.updateSearchResults(resultCount, currentIndex);
+        }
+      }
+    }
+  }
+
+  private handleSearchPrevious(event: CustomEvent) {
+    const { searchTerm } = event.detail;
+
+    if (this.chatView) {
+      if (searchTerm.trim()) {
+        // First, perform the search if not already done
+        const resultCount = this.chatView.searchMessages(searchTerm);
+        // Then move to previous result
+        const found = this.chatView.searchPrevious();
+        if (!found) {
+          console.log('No search results found');
+        }
+        
+        // Update toolbar with current search position
+        const chatToolbar = this.shadowRoot?.getElementById('chat-toolbar') as any;
+        if (chatToolbar) {
+          // Get current search index from chat view (we'll need to add a getter)
+          const currentIndex = this.chatView.getCurrentSearchIndex();
+          chatToolbar.updateSearchResults(resultCount, currentIndex);
+        }
+      }
+    }
+  }
+
   private loadDemoData() {
     // Load demo data to test the chat view and toolbar
     const demoMessages = [
@@ -210,7 +276,47 @@ export class WhatsAppViewerApp extends LitElement {
         id: '3',
         timestamp: new Date('2024-01-15T10:07:00'),
         sender: 'Sarah',
-        content: 'Sounds good to me!',
+        content: 'Sounds good to me! Pizza is always a great choice.',
+        type: MessageType.TEXT,
+        quotedMessage: undefined,
+        attachments: [],
+        isSystemMessage: false
+      },
+      {
+        id: '4',
+        timestamp: new Date('2024-01-15T10:10:00'),
+        sender: 'John',
+        content: 'What kind of pizza should we get? I like pepperoni.',
+        type: MessageType.TEXT,
+        quotedMessage: undefined,
+        attachments: [],
+        isSystemMessage: false
+      },
+      {
+        id: '5',
+        timestamp: new Date('2024-01-15T10:12:00'),
+        sender: 'You',
+        content: 'Pepperoni sounds perfect! Should we order from Pizza Palace?',
+        type: MessageType.TEXT,
+        quotedMessage: undefined,
+        attachments: [],
+        isSystemMessage: false
+      },
+      {
+        id: '6',
+        timestamp: new Date('2024-01-15T10:15:00'),
+        sender: 'Sarah',
+        content: 'Yes, Pizza Palace has the best pepperoni pizza in town!',
+        type: MessageType.TEXT,
+        quotedMessage: undefined,
+        attachments: [],
+        isSystemMessage: false
+      },
+      {
+        id: '7',
+        timestamp: new Date('2024-01-15T10:20:00'),
+        sender: 'John',
+        content: 'Great! I\'ll call them now. Should we get a large pizza?',
         type: MessageType.TEXT,
         quotedMessage: undefined,
         attachments: [],
