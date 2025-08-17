@@ -11,6 +11,7 @@ export class OnboardingView extends LitElement {
   static styles = unsafeCSS(styles);
 
   private isDragOver = false;
+  private fileInput: HTMLInputElement | null = null;
 
   private handleDragOver(e: DragEvent): void {
     e.preventDefault();
@@ -41,6 +42,27 @@ export class OnboardingView extends LitElement {
     this.dispatchEvent(new CustomEvent('load-demo'));
   }
 
+  private handleUploadZoneClick(): void {
+    if (this.fileInput) {
+      this.fileInput.click();
+    }
+  }
+
+  private handleFileInputChange(e: Event): void {
+    const target = e.target as HTMLInputElement;
+    const files = target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      chatStateService.processFile(file);
+      // Reset the input so the same file can be selected again
+      target.value = '';
+    }
+  }
+
+  firstUpdated(): void {
+    this.fileInput = this.shadowRoot?.querySelector('#file-input') as HTMLInputElement;
+  }
+
   render() {
     return html`
       <div class="onboarding-container">
@@ -55,13 +77,22 @@ export class OnboardingView extends LitElement {
               @dragover=${this.handleDragOver}
               @dragleave=${this.handleDragLeave}
               @drop=${this.handleDrop}
+              @click=${this.handleUploadZoneClick}
             >
               <svg class="upload-icon" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
                 <path d="M10 9v3m0 0v3m0-3h3m-3 0H7"/>
               </svg>
-              <p class="upload-text">Drag and drop your WhatsApp export folder or zip file here</p>
+              <p class="upload-text">Drag and drop your WhatsApp export folder or zip file here, or click to browse</p>
             </div>
+
+            <input 
+              id="file-input"
+              type="file" 
+              accept=".zip"
+              style="display: none;"
+              @change=${this.handleFileInputChange}
+            >
             
             <a href="#" class="demo-link" @click=${this.handleDemoClick}>
               <svg class="demo-icon" fill="currentColor" viewBox="0 0 20 20">
