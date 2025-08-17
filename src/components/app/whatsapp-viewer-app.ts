@@ -3,9 +3,9 @@ import { customElement } from 'lit/decorators.js';
 import '../onboarding/onboarding-view';
 import { chatStateService } from '../../utils/chat-state-service.js';
 import { AppState, ChatRow, MessageType } from '../../types/index.js';
-import { ChatView } from '../message-renderer/index.js';
+import { ChatView } from '../chat-viewer/index.js';
 import '../ui/top-toolbar';
-import '../message-renderer/chat-toolbar.js';
+import '../chat-viewer/chat-toolbar.js';
 import styles from './whatsapp-viewer-app.scss?inline';
 
 
