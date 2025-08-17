@@ -41,11 +41,14 @@ export class ChatView {
     return `
       <div class="message-wrapper ${messageClass}">
         <div class="message-bubble">
+          <div class="message-sender">
+            ${this.escapeHtml(message.sender)}
+          </div>
           <div class="message-content">
             ${this.escapeHtml(message.content)}
           </div>
           <div class="message-timestamp">
-            ${this.formatTime(message.timestamp)}
+            ${this.formatDate(message.timestamp)} at ${this.formatTime(message.timestamp)}
           </div>
         </div>
       </div>
@@ -65,5 +68,19 @@ export class ChatView {
     const displayHours = hours % 12 || 12;
     const displayMinutes = minutes.toString().padStart(2, '0');
     return `${displayHours}:${displayMinutes} ${ampm}`;
+  }
+
+  private formatDate(date: Date): string {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString();
+    }
   }
 }

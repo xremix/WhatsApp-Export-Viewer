@@ -45,6 +45,21 @@
   }
 }
 
+.message-sender {
+  font-size: 12px;
+  font-weight: 600;
+  color: #667781;
+  margin-bottom: 2px;
+  
+  .own-message & {
+    text-align: right;
+  }
+  
+  .other-message & {
+    text-align: left;
+  }
+}
+
 .message-content {
   font-size: 14px;
   line-height: 1.4;
