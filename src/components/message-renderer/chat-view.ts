@@ -15,56 +15,47 @@ export class ChatView {
   }
 
   private render() {
-    this.container.innerHTML = '';
+    const messagesHtml = this.messages.map(message => this.createMessageHtml(message)).join('');
     
-    // Create chat container
-    const chatContainer = document.createElement('div');
-    chatContainer.className = 'chat-container';
-    
-    // Add messages
-    this.messages.forEach(message => {
-      const messageElement = this.createMessageElement(message);
-      chatContainer.appendChild(messageElement);
-    });
-    
-    this.container.appendChild(chatContainer);
+    this.container.innerHTML = `
+      <div class="chat-container">
+        ${messagesHtml}
+      </div>
+    `;
   }
 
-  private createMessageElement(message: ChatRow): HTMLElement {
-    const messageWrapper = document.createElement('div');
-    messageWrapper.className = 'message-wrapper';
-    
-    // Determine if this is a system message or regular message
+  private createMessageHtml(message: ChatRow): string {
     if (message.metadata?.isSystemMessage) {
-      messageWrapper.className += ' system-message';
-      const systemElement = document.createElement('div');
-      systemElement.className = 'system-message-content';
-      systemElement.textContent = message.content;
-      messageWrapper.appendChild(systemElement);
-    } else {
-      // Regular message
-      const isOwnMessage = message.sender === 'You' || message.sender === 'Me';
-      messageWrapper.className += isOwnMessage ? ' own-message' : ' other-message';
-      
-      const messageBubble = document.createElement('div');
-      messageBubble.className = 'message-bubble';
-      
-      // Message content
-      const contentElement = document.createElement('div');
-      contentElement.className = 'message-content';
-      contentElement.textContent = message.content;
-      messageBubble.appendChild(contentElement);
-      
-      // Timestamp
-      const timestampElement = document.createElement('div');
-      timestampElement.className = 'message-timestamp';
-      timestampElement.textContent = this.formatTime(message.timestamp);
-      messageBubble.appendChild(timestampElement);
-      
-      messageWrapper.appendChild(messageBubble);
+      return `
+        <div class="message-wrapper system-message">
+          <div class="system-message-content">
+            ${this.escapeHtml(message.content)}
+          </div>
+        </div>
+      `;
     }
+
+    const isOwnMessage = message.sender === 'You' || message.sender === 'Me';
+    const messageClass = isOwnMessage ? 'own-message' : 'other-message';
     
-    return messageWrapper;
+    return `
+      <div class="message-wrapper ${messageClass}">
+        <div class="message-bubble">
+          <div class="message-content">
+            ${this.escapeHtml(message.content)}
+          </div>
+          <div class="message-timestamp">
+            ${this.formatTime(message.timestamp)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   private formatTime(date: Date): string {

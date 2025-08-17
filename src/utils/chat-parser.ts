@@ -59,11 +59,10 @@ export class ChatParser {
     let currentRow: Partial<ChatRow> | null = null;
     let currentContent: string[] = [];
 
-    debugger;
-
     for (const line of lines) {
       // Check if this line starts a new message (matches WhatsApp format)
-      const messageMatch = line.match(/^\[(\d{1,2}\.\d{1,2}\.\d{2,4}),\s+(\d{1,2}:\d{2}:\d{2})\]\s+(.+?):\s*(.+)$/);
+      // Format: [DD.MM.YY, HH:MM:SS] Name: Message
+      const messageMatch = line.match(/^\[(\d{1,2}\.\d{1,2}\.\d{2,4}),\s*(\d{1,2}:\d{2}:\d{2})\]\s+(.+?):\s*(.+)$/);
       
       if (messageMatch) {
         // Save previous row if exists
@@ -74,13 +73,20 @@ export class ChatParser {
 
         // Start new row
         const [, dateStr, timeStr, sender, content] = messageMatch;
+        
+        // Validate that we have all required parts
+        if (!dateStr || !timeStr || !sender || content === undefined) {
+          console.warn('Invalid message format, skipping line:', line);
+          continue;
+        }
+        
         const timestamp = ChatParser.parseTimestamp(dateStr, timeStr);
         
         currentRow = {
           id: ChatParser.generateId(),
           timestamp,
           sender: sender.trim(),
-          content: content.trim(),
+          content: '',
           type: ChatRowType.MESSAGE,
           metadata: ChatParser.parseMetadata(content)
         };
@@ -100,20 +106,117 @@ export class ChatParser {
       rows.push(currentRow as ChatRow);
     }
 
-    return rows;
+    // Now process all rows to split messages that contain embedded timestamps
+    return ChatParser.splitEmbeddedMessages(rows);
+  }
+
+  /**
+   * Split messages that contain embedded timestamp patterns
+   * @param rows - Array of ChatRow objects
+   * @returns Array of ChatRow objects with embedded messages split
+   */
+  private static splitEmbeddedMessages(rows: ChatRow[]): ChatRow[] {
+    const result: ChatRow[] = [];
+    
+    for (const row of rows) {
+      const content = row.content;
+      
+      // Find all timestamp patterns in the content
+      const timestampPattern = /\[(\d{1,2}\.\d{1,2}\.\d{2,4}),\s*(\d{1,2}:\d{2}:\d{2})\]\s+(.+?):\s*(.+)/g;
+      const matches = Array.from(content.matchAll(timestampPattern));
+      
+      if (matches.length === 0) {
+        // No embedded timestamps, keep as is
+        result.push(row);
+        continue;
+      }
+      
+      // Split the content at each timestamp
+      let lastIndex = 0;
+      let currentContent = '';
+      
+      for (const match of matches) {
+        const matchIndex = match.index!;
+        
+        // Add content before this timestamp to the current message
+        currentContent += content.substring(lastIndex, matchIndex);
+        
+        // If we have content, save the current message
+        if (currentContent.trim()) {
+          const splitRow: ChatRow = {
+            ...row,
+            id: ChatParser.generateId(),
+            content: currentContent.trim()
+          };
+          result.push(splitRow);
+        }
+        
+        // Start new message from this timestamp
+        const [, dateStr, timeStr, sender, messageContent] = match;
+        const timestamp = ChatParser.parseTimestamp(dateStr, timeStr);
+        
+        const newRow: ChatRow = {
+          id: ChatParser.generateId(),
+          timestamp,
+          sender: sender.trim(),
+          content: messageContent.trim(),
+          type: ChatRowType.MESSAGE,
+          metadata: ChatParser.parseMetadata(messageContent)
+        };
+        
+        result.push(newRow);
+        
+        // Update for next iteration
+        lastIndex = matchIndex + match[0].length;
+        currentContent = '';
+      }
+      
+      // Add any remaining content after the last timestamp
+      const remainingContent = content.substring(lastIndex);
+      if (remainingContent.trim()) {
+        const finalRow: ChatRow = {
+          ...row,
+          id: ChatParser.generateId(),
+          content: remainingContent.trim()
+        };
+        result.push(finalRow);
+      }
+    }
+    
+    return result;
   }
 
   /**
    * Parse timestamp from date and time strings
    */
   private static parseTimestamp(dateStr: string, timeStr: string): Date {
-    // Handle DD.MM.YY format
+    // Handle DD.MM.YY format (e.g., 14.04.14)
     const [day, month, year] = dateStr.split('.');
-    const fullYear = year.length === 2 ? `20${year}` : year;
+    
+    // Validate date parts
+    if (!day || !month || !year) {
+      throw new Error(`Invalid date format: ${dateStr}`);
+    }
+    
+    // Handle 2-digit years (assume 20xx for years < 50, 19xx for years >= 50)
+    let fullYear: string;
+    if (year.length === 2) {
+      const yearNum = parseInt(year);
+      fullYear = yearNum < 50 ? `20${year}` : `19${year}`;
+    } else {
+      fullYear = year;
+    }
+    
     const date = new Date(parseInt(fullYear), parseInt(month) - 1, parseInt(day));
 
     // Parse time (HH:MM:SS format)
     const [hours, minutes, seconds] = timeStr.split(':');
+    
+    // Validate time parts
+    if (!hours || !minutes || !seconds) {
+      throw new Error(`Invalid time format: ${timeStr}`);
+    }
+    
     date.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds));
 
     return date;
