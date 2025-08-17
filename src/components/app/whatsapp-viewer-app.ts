@@ -1,11 +1,11 @@
 import { LitElement, html, unsafeCSS } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import '../onboarding/onboarding-view';
 import { chatStateService } from '../../utils/chat-state-service.js';
 import { AppState, ChatRow, MessageType } from '../../types/index.js';
 import { ChatView } from '../message-renderer/index.js';
 import '../ui/top-toolbar';
-import '../ui/chat-toolbar';
+import '../message-renderer/chat-toolbar.js';
 import styles from './whatsapp-viewer-app.scss?inline';
 
 
