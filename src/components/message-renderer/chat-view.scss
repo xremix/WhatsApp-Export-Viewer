@@ -1,9 +1,10 @@
+/* Chat styles */
 .chat-container {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  background-color: #ffffff;
+  background-color: #EDE8E0;
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -11,15 +12,15 @@
 .message-wrapper {
   display: flex;
   margin-bottom: 4px;
-  
+
   &.own-message {
     justify-content: flex-end;
   }
-  
+
   &.other-message {
     justify-content: flex-start;
   }
-  
+
   &.system-message {
     justify-content: center;
     margin: 16px 0;
@@ -32,32 +33,17 @@
   border-radius: 8px;
   position: relative;
   word-wrap: break-word;
-  
-  .own-message & {
-    background-color: #dcf8c6;
-    color: #303030;
-  }
-  
-  .other-message & {
-    background-color: #ffffff;
-    color: #303030;
-    border: 1px solid #e9e9e9;
-  }
 }
 
-.message-sender {
-  font-size: 12px;
-  font-weight: 600;
-  color: #667781;
-  margin-bottom: 2px;
-  
-  .own-message & {
-    text-align: right;
-  }
-  
-  .other-message & {
-    text-align: left;
-  }
+.own-message .message-bubble {
+  background-color: #dcf8c6;
+  color: #303030;
+}
+
+.other-message .message-bubble {
+  background-color: #ffffff;
+  color: #303030;
+  border: 1px solid #e9e9e9;
 }
 
 .message-content {
@@ -71,10 +57,10 @@
   color: #667781;
   text-align: right;
   margin-top: 2px;
-  
-  .other-message & {
-    text-align: left;
-  }
+}
+
+.other-message .message-timestamp {
+  text-align: left;
 }
 
 .system-message-content {
@@ -89,7 +75,7 @@
 
 .message-image {
   margin: 8px 0;
-  
+
   img {
     max-width: 100%;
     max-height: 300px;
@@ -97,7 +83,7 @@
     object-fit: cover;
     cursor: pointer;
     transition: opacity 0.2s ease;
-    
+
     &:hover {
       opacity: 0.9;
     }
