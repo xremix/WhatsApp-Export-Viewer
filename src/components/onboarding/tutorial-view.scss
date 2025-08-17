@@ -27,9 +27,56 @@
   color: #111b21;
 }
 
-.tutorial-content {
+.tabs-container {
   max-width: 600px;
   width: 100%;
+}
+
+.tabs-header {
+  display: flex;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tab-button:hover {
+  color: #374151;
+  background-color: #f9fafb;
+}
+
+.tab-button.active {
+  color: #25d366;
+  border-bottom-color: #25d366;
+}
+
+.tab-content {
+  min-height: 300px;
+}
+
+.tutorial-content {
+  max-width: 100%;
+  width: 100%;
+}
+
+.content-title {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111b21;
+  text-align: left;
 }
 
 .tutorial-text {
