@@ -74,22 +74,3 @@
   margin: 0;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-}
-
-.pagination-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #e5e7eb;
-  transition: background-color 0.2s ease-in-out;
-
-  &.active {
-    background-color: #25d366;
-  }
-}

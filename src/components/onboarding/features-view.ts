@@ -47,12 +47,6 @@ export class FeaturesView extends LitElement {
               </div>
             `)}
           </div>
-
-          <div class="pagination">
-            <div class="pagination-dot active"></div>
-            <div class="pagination-dot"></div>
-            <div class="pagination-dot"></div>
-          </div>
         </main>
       </div>
     `;
