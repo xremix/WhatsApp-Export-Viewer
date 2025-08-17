@@ -86,3 +86,94 @@
   margin: 0 0 1.5rem 0;
   text-align: left;
 }
+
+// New tutorial styles
+.tutorial-section {
+  margin-bottom: 2.5rem;
+}
+
+.section-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111b21;
+  text-align: left;
+}
+
+.tutorial-list {
+  margin: 0 0 1.5rem 0;
+  padding-left: 1.5rem;
+  text-align: left;
+}
+
+.tutorial-list li {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: #25d366;
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111b21;
+  text-align: left;
+}
+
+.note-box {
+  background-color: #f0f9ff;
+  border: 1px solid #0ea5e9;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+.note-box .tutorial-text {
+  margin-bottom: 1rem;
+}
+
+.note-box .tutorial-text:last-child {
+  margin-bottom: 0;
+}
+
+.troubleshooting {
+  background-color: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+.troubleshooting .tutorial-text {
+  margin-bottom: 1rem;
+}
+
+.troubleshooting .tutorial-text:last-child {
+  margin-bottom: 0;
+}
