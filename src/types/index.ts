@@ -36,13 +36,7 @@ export enum MessageType {
   SYSTEM = 'system'
 }
 
-export enum AttachmentType {
-  IMAGE = 'image',
-  VIDEO = 'video',
-  AUDIO = 'audio',
-  DOCUMENT = 'document',
-  STICKER = 'sticker'
-}
+export type AttachmentType = 'image' | 'video' | 'audio' | 'document' | 'sticker';
 
 // Application state
 export interface AppState {
@@ -75,7 +69,10 @@ export interface ChatRow {
 export interface ChatRowMetadata {
   isSystemMessage: boolean;
   hasAttachment: boolean;
-  attachmentType?: string;
+  attachmentType?: AttachmentType;
+  attachmentFilename?: string;
+  attachmentData?: string;
+  attachmentSize?: number;
   quotedMessage?: string;
   edited?: boolean;
   deleted?: boolean;

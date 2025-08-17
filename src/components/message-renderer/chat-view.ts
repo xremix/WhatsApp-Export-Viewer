@@ -1,4 +1,4 @@
-import { ChatRow } from '../../types/index.js';
+import { ChatRow, AttachmentType } from '../../types/index.js';
 
 export class ChatView {
   private container: HTMLElement;
@@ -29,6 +29,9 @@ export class ChatView {
         ${messagesHtml}
       </div>
     `;
+    
+    // Scroll to the bottom after rendering
+    this.scrollToBottom();
   }
 
   private createMessageHtml(message: ChatRow): string {
@@ -45,12 +48,28 @@ export class ChatView {
     const isOwnMessage = message.sender === this.ownName;
     const messageClass = isOwnMessage ? 'own-message' : 'other-message';
     
+    // Handle image attachments
+    let imageHtml = '';
+    if(message.metadata?.hasAttachment){
+      debugger;
+    }
+    if (message.metadata?.hasAttachment && 
+        message.metadata?.attachmentType === 'image' as AttachmentType && 
+        message.metadata?.attachmentData) {
+      imageHtml = `
+        <div class="message-image">
+          <img src="${message.metadata.attachmentData}" alt="Attachment" />
+        </div>
+      `;
+    }
+    
     return `
       <div class="message-wrapper ${messageClass}">
         <div class="message-bubble">
           <div class="message-sender">
             ${this.escapeHtml(message.sender)}
           </div>
+          ${imageHtml}
           <div class="message-content">
             ${this.escapeHtml(message.content)}
           </div>
@@ -89,5 +108,12 @@ export class ChatView {
     } else {
       return date.toLocaleDateString();
     }
+  }
+
+  private scrollToBottom() {
+    // Use requestAnimationFrame to ensure DOM is updated before scrolling
+    requestAnimationFrame(() => {
+      this.container.scrollTop = this.container.scrollHeight;
+    });
   }
 }

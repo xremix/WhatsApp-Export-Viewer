@@ -147,16 +147,31 @@ class ChatStateService {
       
       // Convert ChatRow objects to WhatsAppMessage objects for now
       // TODO: Update AppState to use ChatRow instead of WhatsAppMessage
-      const messages = chatRows.map(row => ({
-        id: row.id,
-        timestamp: row.timestamp,
-        sender: row.sender,
-        content: row.content,
-        type: 'text' as any, // TODO: map ChatRowType to MessageType
-        quotedMessage: undefined,
-        attachments: [],
-        isSystemMessage: row.metadata?.isSystemMessage || false
-      }));
+      const messages = chatRows.map(row => {
+        // Create attachments array if there are attachments
+        const attachments = [];
+        if (row.metadata?.hasAttachment && row.metadata?.attachmentType) {
+          attachments.push({
+            id: row.id,
+            filename: row.metadata.attachmentFilename || '',
+            type: row.metadata.attachmentType,
+            size: row.metadata.attachmentSize || 0,
+            data: row.metadata.attachmentData ? new Blob() : undefined, // We'll handle this differently
+            url: row.metadata.attachmentData
+          });
+        }
+
+        return {
+          id: row.id,
+          timestamp: row.timestamp,
+          sender: row.sender,
+          content: row.content,
+          type: 'text' as any, // TODO: map ChatRowType to MessageType
+          quotedMessage: undefined,
+          attachments,
+          isSystemMessage: row.metadata?.isSystemMessage || false
+        };
+      });
       
       this.setMessages(messages);
       this.updateState({ ownName });

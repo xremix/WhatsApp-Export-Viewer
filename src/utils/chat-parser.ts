@@ -1,5 +1,5 @@
 import JSZip from 'jszip';
-import { ChatRow, ChatRowType, ChatRowMetadata } from '../types/index.js';
+import { ChatRow, ChatRowType, ChatRowMetadata, AttachmentType } from '../types/index.js';
 
 export class ChatParser {
   /**
@@ -38,6 +38,9 @@ export class ChatParser {
       
       // Parse the text content into ChatRow objects
       const chatRows = ChatParser.parseFromText(textContent);
+      
+      // Extract and attach image files
+      await ChatParser.attachImages(chatRows, zipContent);
       
       return chatRows;
       
@@ -270,11 +273,19 @@ export class ChatParser {
         content.includes('sticker omitted')) {
       metadata.hasAttachment = true;
       
-      if (content.includes('image omitted')) metadata.attachmentType = 'image';
-      else if (content.includes('video omitted')) metadata.attachmentType = 'video';
-      else if (content.includes('audio omitted')) metadata.attachmentType = 'audio';
-      else if (content.includes('document omitted')) metadata.attachmentType = 'document';
-      else if (content.includes('sticker omitted')) metadata.attachmentType = 'sticker';
+      if (content.includes('image omitted')) metadata.attachmentType = 'image' as AttachmentType;
+      else if (content.includes('video omitted')) metadata.attachmentType = 'video' as AttachmentType;
+      else if (content.includes('audio omitted')) metadata.attachmentType = 'audio' as AttachmentType;
+      else if (content.includes('document omitted')) metadata.attachmentType = 'document' as AttachmentType;
+      else if (content.includes('sticker omitted')) metadata.attachmentType = 'sticker' as AttachmentType;
+    }
+
+    // Check for image attachments in format <WHATEVER: filename.jpg/png>
+    const imageAttachmentMatch = content.match(/<[^:]+:\s*([^>]+\.(jpg|jpeg|png))>/i);
+    if (imageAttachmentMatch) {
+      metadata.hasAttachment = true;
+      metadata.attachmentType = 'image' as AttachmentType;
+      metadata.attachmentFilename = imageAttachmentMatch[1].trim();
     }
 
     // Check for edited messages
@@ -289,6 +300,65 @@ export class ChatParser {
     }
 
     return metadata;
+  }
+
+  /**
+   * Attach image files to chat rows that have image attachments
+   */
+  private static async attachImages(chatRows: ChatRow[], zipContent: JSZip): Promise<void> {
+    // Get all image files from the ZIP
+    const imageFiles = new Map<string, JSZip.JSZipObject>();
+    
+    zipContent.forEach((relativePath, zipEntry) => {
+      const lowerName = zipEntry.name.toLowerCase();
+      if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png')) {
+        imageFiles.set(zipEntry.name, zipEntry);
+      }
+    });
+
+    // Process each chat row that has an image attachment
+    for (const row of chatRows) {
+      if (row.metadata?.hasAttachment && 
+          row.metadata?.attachmentType === 'image' as AttachmentType && 
+          row.metadata?.attachmentFilename) {
+        
+        const filename = row.metadata.attachmentFilename;
+        
+        // Try to find the image file (fuzzy matching)
+        let foundFile: JSZip.JSZipObject | null = null;
+        
+        // First try exact match
+        if (imageFiles.has(filename)) {
+          foundFile = imageFiles.get(filename)!;
+        } else {
+          // Try fuzzy matching - look for files that contain the filename
+          for (const [zipFileName, zipEntry] of imageFiles) {
+            if (zipFileName.includes(filename) || filename.includes(zipFileName)) {
+              foundFile = zipEntry;
+              break;
+            }
+          }
+        }
+        
+        if (foundFile) {
+          try {
+            // Extract the image as a blob
+            const imageBlob = await foundFile.async('blob');
+            
+            // Create a data URL for the image
+            const imageUrl = URL.createObjectURL(imageBlob);
+            
+            // Store the image data in the row
+            row.metadata!.attachmentData = imageUrl;
+            row.metadata!.attachmentSize = imageBlob.size;
+          } catch (error) {
+            console.warn(`Failed to extract image ${filename}:`, error);
+          }
+        } else {
+          console.warn(`Image file not found in ZIP: ${filename}`);
+        }
+      }
+    }
   }
 
   /**

@@ -103,6 +103,23 @@ export class WhatsAppViewerApp extends LitElement {
       text-align: center;
       max-width: 80%;
     }
+
+    .message-image {
+      margin: 8px 0;
+    }
+
+    .message-image img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .message-image img:hover {
+      opacity: 0.9;
+    }
   `;
 
   private appState: AppState = chatStateService.getState();
@@ -135,17 +152,30 @@ export class WhatsAppViewerApp extends LitElement {
       
       // Update chat view if messages are available
       if (state.messages.length > 0 && this.chatView) {
-        const chatRows: ChatRow[] = state.messages.map(msg => ({
-          id: msg.id,
-          timestamp: msg.timestamp,
-          sender: msg.sender,
-          content: msg.content,
-          type: msg.type as any,
-          metadata: {
+        const chatRows: ChatRow[] = state.messages.map(msg => {
+          const metadata: any = {
             isSystemMessage: msg.isSystemMessage,
             hasAttachment: msg.attachments.length > 0
+          };
+          
+          // Preserve attachment data if present
+          if (msg.attachments.length > 0) {
+            const attachment = msg.attachments[0]; // For now, handle first attachment
+            metadata.attachmentType = attachment.type;
+            metadata.attachmentFilename = attachment.filename;
+            metadata.attachmentData = attachment.url;
+            metadata.attachmentSize = attachment.size;
           }
-        }));
+          
+          return {
+            id: msg.id,
+            timestamp: msg.timestamp,
+            sender: msg.sender,
+            content: msg.content,
+            type: msg.type as any,
+            metadata
+          };
+        });
         this.chatView.setMessages(chatRows);
       }
     });
@@ -206,17 +236,30 @@ export class WhatsAppViewerApp extends LitElement {
         this.chatView = new ChatView(chatContainer, this.appState.ownName);
         
         // Convert messages to ChatRow format
-        const chatRows: ChatRow[] = this.appState.messages.map(msg => ({
-          id: msg.id,
-          timestamp: msg.timestamp,
-          sender: msg.sender,
-          content: msg.content,
-          type: msg.type as any,
-          metadata: {
+        const chatRows: ChatRow[] = this.appState.messages.map(msg => {
+          const metadata: any = {
             isSystemMessage: msg.isSystemMessage,
             hasAttachment: msg.attachments.length > 0
+          };
+          
+          // Preserve attachment data if present
+          if (msg.attachments.length > 0) {
+            const attachment = msg.attachments[0]; // For now, handle first attachment
+            metadata.attachmentType = attachment.type;
+            metadata.attachmentFilename = attachment.filename;
+            metadata.attachmentData = attachment.url;
+            metadata.attachmentSize = attachment.size;
           }
-        }));
+          
+          return {
+            id: msg.id,
+            timestamp: msg.timestamp,
+            sender: msg.sender,
+            content: msg.content,
+            type: msg.type as any,
+            metadata
+          };
+        });
         
         this.chatView.setMessages(chatRows);
       }
