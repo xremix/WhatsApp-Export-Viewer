@@ -39,7 +39,7 @@ export class ChatView {
       return `
         <div class="message-wrapper system-message">
           <div class="system-message-content">
-            ${this.escapeHtml(message.content)}
+            ${this.processLinks(message.content)}
           </div>
         </div>
       `;
@@ -50,9 +50,7 @@ export class ChatView {
     
     // Handle image attachments
     let imageHtml = '';
-    if(message.metadata?.hasAttachment){
-      debugger;
-    }
+
     if (message.metadata?.hasAttachment && 
         message.metadata?.attachmentType === 'image' as AttachmentType && 
         message.metadata?.attachmentData) {
@@ -75,7 +73,7 @@ export class ChatView {
           ${senderHtml}
           ${imageHtml}
           <div class="message-content">
-            ${this.escapeHtml(message.content)}
+            ${this.processLinks(message.content)}
           </div>
           <div class="message-timestamp">
             ${this.formatDate(message.timestamp)} at ${this.formatTime(message.timestamp)}
@@ -89,6 +87,17 @@ export class ChatView {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  private processLinks(text: string): string {
+    // URL regex pattern that matches http/https URLs
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    return text.replace(urlRegex, (url) => {
+      // Escape the URL to prevent XSS
+      const escapedUrl = this.escapeHtml(url);
+      return `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer">${escapedUrl}</a>`;
+    });
   }
 
   private formatTime(date: Date): string {
