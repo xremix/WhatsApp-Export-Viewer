@@ -63,12 +63,16 @@ export class ChatView {
       `;
     }
     
+    const senderHtml = isOwnMessage ? '' : `
+      <div class="message-sender">
+        ${this.escapeHtml(message.sender)}
+      </div>
+    `;
+    
     return `
       <div class="message-wrapper ${messageClass}">
         <div class="message-bubble">
-          <div class="message-sender">
-            ${this.escapeHtml(message.sender)}
-          </div>
+          ${senderHtml}
           ${imageHtml}
           <div class="message-content">
             ${this.escapeHtml(message.content)}

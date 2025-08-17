@@ -35,7 +35,7 @@ export class WhatsAppViewerApp extends LitElement {
       flex-direction: column;
       gap: 8px;
       padding: 16px;
-      background-color: #ffffff;
+      background-color: #EDE8E0;
       min-height: 100vh;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
