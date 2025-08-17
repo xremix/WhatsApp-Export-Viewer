@@ -182,10 +182,7 @@ export class WhatsAppViewerApp extends LitElement {
         `
         : html`
           <div>
-            <onboarding-view></onboarding-view>
-            <button @click=${this.loadDemoData} style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px; background: #25d366; color: white; border: none; border-radius: 5px; cursor: pointer;">
-              Load Demo Chat
-            </button>
+            <onboarding-view @load-demo=${this.loadDemoData}></onboarding-view>
           </div>
         `
       }

@@ -34,6 +34,11 @@ export class OnboardingView extends LitElement {
     }
   }
 
+  private handleDemoClick(e: Event): void {
+    e.preventDefault();
+    this.dispatchEvent(new CustomEvent('load-demo'));
+  }
+
   render() {
     return html`
       <div class="onboarding-container">
@@ -54,10 +59,12 @@ export class OnboardingView extends LitElement {
             </svg>
             <p class="upload-text">Drag and drop your WhatsApp export folder or zip file here</p>
           </div>
-
-          <a href="#" class="info-link">
-            <div class="info-icon">i</div>
-            Learn how to export your WhatsApp chats
+          
+          <a href="#" class="demo-link" @click=${this.handleDemoClick}>
+            <svg class="demo-icon" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            load demo chat
           </a>
         </main>
 
@@ -65,7 +72,7 @@ export class OnboardingView extends LitElement {
           <svg class="scroll-icon" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
           </svg>
-          Scroll to learn more
+          Scroll to learn how to export your WhatsApp Chats
         </div>
       </div>
     `;

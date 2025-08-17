@@ -97,6 +97,27 @@
   font-weight: bold;
 }
 
+.demo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #25d366;
+  font-size: 0.75rem;
+  text-decoration: none;
+  margin-top: 0.5rem;
+  
+  &:hover {
+    color: #1ea952;
+    text-decoration: underline;
+  }
+}
+
+.demo-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 0.25rem;
+}
+
 .scroll-indicator {
   position: absolute;
   bottom: 2rem;
