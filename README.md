@@ -134,6 +134,10 @@ The project follows a component-based architecture:
 - **Top Toolbar**: Navigation and search interface
 - **Tutorial Views**: Step-by-step guides for different export methods
 
+## Design
+
+To learn more about the history and vision of the design, check the [Design](/docs/Design.md)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
